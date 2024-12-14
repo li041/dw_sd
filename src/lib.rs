@@ -48,7 +48,7 @@ impl DwMmcHost {
 }
 impl Device for DwMmcHost {
     fn init(&mut self) -> Result<(), DeviceError> {
-        info!("init sdio...");
+        info!("init dw sdio");
         let hconf = HardConfig::from_bits(read_reg::<u32>(self.sdio_base, REG_HCON)).unwrap();
         debug!("{hconf:?}");
         self.hard_config = HardConf::from(hconf.bits());
@@ -85,7 +85,7 @@ impl Device for DwMmcHost {
             REG_IDINTEN,
             (DmaIntEn::ri | DmaIntEn::ti).bits(),
         );
-        info!("sdio init success!");
+        info!("sdio init success");
         self.status = DeviceStatus::Idle;
         Ok(())
     }
