@@ -1,10 +1,7 @@
 use lego_device::DeviceError;
 
 use super::reg::InterruptMask;
-use core::{
-    error::Error,
-    fmt::{Debug, Display},
-};
+use core::fmt::{Debug, Display};
 
 #[derive(Debug, Clone, Copy)]
 pub enum CardError {
@@ -13,18 +10,6 @@ pub enum CardError {
     TimeoutErr(Timeout),
     VoltagePattern,
     DataTransferTimeout,
-}
-
-impl Error for CardError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-
-    fn cause(&self) -> Option<&dyn Error> {
-        None
-    }
-
-    fn provide<'a>(&'a self, _request: &mut core::error::Request<'a>) {}
 }
 
 impl Display for CardError {
