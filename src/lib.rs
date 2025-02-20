@@ -1,5 +1,4 @@
 #![no_std]
-#![feature(error_generic_member_access)]
 mod cmd;
 pub mod err;
 mod ops;
