@@ -109,6 +109,62 @@ impl DwMmcHost {
     }
 }
 
+impl DwMmcHost {
+    fn block_size(&self) -> BlockSize {
+        BlockSize::Lb512
+    }
+    pub fn read_block(&mut self, lba: usize, buf: &mut [u8]) -> Result<(), DeviceError> {
+        trace!("read block, address: {},", lba);
+        let cmd = read_single_block(lba as u32);
+        match self.mmc_opt.send_cmd(cmd) {
+            Ok(resp) => {
+                let status = resp.card_status();
+                debug!("{status:?}");
+                let blk_sz = self.block_size() as u32;
+                let blk = buf.len() as u32 / blk_sz;
+                match self.mmc_opt.read_data(buf, blk, blk_sz) {
+                    Ok(_) => Ok(()),
+                    Err(err) => {
+                        debug!("{err:?}");
+                        self.mmc_opt.stop_transmission_ops()?;
+                        Err(DeviceError::IoError)
+                    }
+                }
+            }
+            Err(err) => {
+                debug!("{err:?}");
+                self.mmc_opt.stop_transmission_ops()?;
+                Err(DeviceError::IoError)
+            }
+        }
+    }
+
+    pub fn write_block(&self, lba: usize, data: &[u8]) -> Result<(), DeviceError> {
+        let cmd = write_single_block(lba as u32);
+        match self.mmc_opt.send_cmd(cmd) {
+            Ok(resp) => {
+                let status = resp.card_status();
+                debug!("{status:?}");
+                let blk_sz = self.block_size() as u32;
+                let blk = data.len() as u32 / blk_sz;
+                match self.mmc_opt.write_data(data, blk, blk_sz) {
+                    Ok(_) => Ok(()),
+                    Err(err) => {
+                        debug!("{err:?}");
+                        self.mmc_opt.stop_transmission_ops()?;
+                        Err(DeviceError::IoError)
+                    }
+                }
+            }
+            Err(err) => {
+                debug!("{err:?}");
+                self.mmc_opt.stop_transmission_ops()?;
+                Err(DeviceError::IoError)
+            }
+        }
+    }
+}
+
 // impl BlockDevice for DwMmcHost {
 //     fn read_block(&mut self, lba: usize, buf: &mut [u8]) -> Result<(), DeviceError> {
 //         trace!("read block, address: {},", lba);
