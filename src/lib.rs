@@ -9,7 +9,8 @@ mod timer;
 use cmd::*;
 
 use lego_device::{
-    read_reg, write_reg, BlkDevInfo, BlockDevice, BlockSize, Device, DeviceError, DeviceStatus, DeviceType
+    read_reg, write_reg, BlkDevInfo, BlockDevice, BlockSize, Device, DeviceError, DeviceStatus,
+    DeviceType,
 };
 use log::{debug, info, trace};
 use ops::*;
@@ -26,7 +27,7 @@ pub struct DwMmcHost {
     csd: Csd,
     hard_config: HardConf,
     mmc_opt: MmcOperate,
-    status: DeviceStatus
+    status: DeviceStatus,
 }
 
 impl DwMmcHost {
@@ -41,12 +42,10 @@ impl DwMmcHost {
             csd: Csd::new(),
             hard_config: HardConf(0),
             mmc_opt: mmc,
-            status: DeviceStatus::Uninitialized
+            status: DeviceStatus::Uninitialized,
         }
     }
-}
-impl Device for DwMmcHost {
-    fn init(&mut self) -> Result<(), DeviceError> {
+    pub fn init(&mut self) -> Result<(), DeviceError> {
         info!("init dw sdio");
         let hconf = HardConfig::from_bits(read_reg::<u32>(self.sdio_base, REG_HCON)).unwrap();
         debug!("{hconf:?}");
