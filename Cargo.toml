@@ -9,3 +9,6 @@ lego_device = { git = "https://github.com/lego-os/lego_device.git", features = [
 ], branch = "main" }
 bitflags = { version = "2", default-features = false }
 log = { version = "0.4", default-features = false }
+
+[features]
+virt = []
